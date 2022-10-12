@@ -1,0 +1,83 @@
+@BASE_URL=http://localhost:3000/api
+
+###
+GET {{BASE_URL}}
+
+###
+GET {{BASE_URL}}/users
+Authorization:
+
+###
+GET {{BASE_URL}}/users/55
+Content-Type:
+
+
+
+
+
+
+###
+POST {{BASE_URL}}/users
+Content-Type: application/json
+
+{
+    "name":"özgü32",
+    "email":"dgumu2slqweqweqwe23u1258@gmail.com",
+    "userName":"ozgur23mqwgdggfsgfgfseqwesl2l1",
+    "password":"qweqweqwe123"
+
+}
+###
+POST {{BASE_URL}}/users/giris
+Content-Type: application/json
+
+{
+    
+    "email":"dgumu2slqweqweqwe23u1258@gmail.com",
+
+
+
+    "password":"qweqweqwe123"
+
+}
+
+###
+DELETE  {{BASE_URL}}/users/me
+Authorization:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNkNjk4NDE5ZTM5OTNiYjBkMmNhY2YiLCJpYXQiOjE2NjQ5NjkxMjcsImV4cCI6MTY2NDk3MjcyN30.nsWpY4JoMtvacVfotnnioXVo1TI7hrDxMV91rhcEDKE
+
+
+###
+DELETE {{BASE_URL}}/users/633307dcaf3959297704a2e2
+Content-Type: application/json
+
+
+###
+DELETE {{BASE_URL}}/users/deleteAll
+Content-Type: application/json
+Authorization: 
+###
+PATCH  {{BASE_URL}}/users/6334643d9125747bd99d8067
+Content-Type: application/json
+
+{
+    
+}
+###
+PATCH  {{BASE_URL}}/users/me
+Content-Type: application/json
+Authorization: 
+
+{
+    
+}
+
+
+
+
+
+
+
+
+
+
+

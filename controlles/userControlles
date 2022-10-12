@@ -1,0 +1,128 @@
+const User = require("../models/users.js");
+const bcrypt = require("bcrypt");
+const createError = require("http-errors");
+
+const tumUserslariListele = async (req, res) => {
+  const allUsers = await User.find({});
+  res.json(allUsers);
+};
+
+const oturumAcanKullanıcıBilgilerim = (req, res) => {
+  res.json(req.user);
+};
+
+const kullaniciKendiBilgileriniGüncelleme = async (req, res) => {
+  delete req.body.createAt;
+  delete req.body.updateAt;
+  if (req.body.hasOwnProperty("password")) {
+    req.body.password = await bcrypt.hash(req.body.password, 8);
+  }
+
+  const { error, value } = User.joiValidationForUpdate(req.body);
+  if (error) {
+    next(createError(400));
+    console.log("kayıt hatası");
+  } else {
+    try {
+      const result = await User.findByIdAndUpdate(
+        { _id: req.user.id },
+        req.body,
+        { new: true, runValidators: true }
+      );
+      if (result) {
+        return res.json(result);
+      } else {
+        return res.status(404).json({ mesaj: "Kullanıcı bulanamdı" });
+      }
+    } catch (error) {
+      next(createError(error));
+    }
+  }
+};
+const yeniUserOlustur = async (req, res, next) => {
+  try {
+    const pushUsers = new User(req.body);
+    pushUsers.password = await bcrypt.hash(pushUsers.password, 8);
+    const { error, value } = pushUsers.joiValidation(req.body);
+    if (error) {
+      next(createError(400));
+      console.log("kayıt hatası");
+    } else {
+      const result = await pushUsers.save();
+      res.json(result);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const girisYap = async (req, res, next) => {
+  try {
+    const result = await User.loading(req.body.email, req.body.password);
+    const token = await result.generateToken();
+    res.json({
+      result,
+      token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const AdminId = async (req, res, next) => {
+  try {
+    const result = await User.findByIdAndDelete({ _id: req.params.id });
+    if (result) {
+      return res.json({ mesaj: "kullanıcı silindi" });
+    } else {
+      // return res.status(404).json({mesaj:"Kullanıcı bulanamdı"})
+      // const errorObject=new Error('Kullanıcı Bulunamadı')
+      // errorObject.errorCode=404
+      throw createError(404, "Kullanıcı Bulunamadı");
+    }
+  } catch (error) {
+    next(createError(400, error));
+  }
+};
+
+const adminToplusilme = async (req, res, next) => {
+  try {
+    const result = await User.deleteMany({ isAdmin: false });
+    if (result) {
+      return res.json({ mesaj: "Tüm kullanıcılar silindi" });
+    } else {
+      // return res.status(404).json({mesaj:"Kullanıcı bulanamdı"})
+      // const errorObject=new Error('Kullanıcı Bulunamadı')
+      // errorObject.errorCode=404
+      throw createError(404, "Kullanıcı Bulunamadı");
+    }
+  } catch (error) {
+    next(createError(400, error));
+  }
+};
+
+const userkendinisilme = async (req, res, next) => {
+  try {
+    const result = await User.findByIdAndDelete({ _id: req.user._id });
+    if (result) {
+      return res.json({ mesaj: "kullanıcı silindi" });
+    } else {
+      // return res.status(404).json({mesaj:"Kullanıcı bulanamdı"})
+      // const errorObject=new Error('Kullanıcı Bulunamadı')
+      // errorObject.errorCode=404
+      throw createError(404, "Kullanıcı Bulunamadı");
+    }
+  } catch (error) {
+    next(createError(400, error));
+  }
+};
+module.exports = {
+  tumUserslariListele,
+  oturumAcanKullanıcıBilgilerim,
+  kullaniciKendiBilgileriniGüncelleme,
+  yeniUserOlustur,
+  girisYap,
+  AdminId,
+  adminToplusilme,
+  userkendinisilme,
+};
